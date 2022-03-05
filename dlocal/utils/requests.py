@@ -38,4 +38,5 @@ def generate_signature(date, body):
 def check_for_errors(req, res):
     if req.status_code >= 400:
         raise DlocalException(code=res.get('code'),
+                              param=res.get('param'),
                               message=res.get('message', f'Unkwnon Dlocal error occured: {str(res)}'))

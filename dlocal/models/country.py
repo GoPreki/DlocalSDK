@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from dlocal.utils.exceptions import DlocalException, DlocalErrorCode
 
 
 @dataclass
@@ -8,7 +9,7 @@ class Country:
     @staticmethod
     def get_country_by_name(name: str) -> 'Country':
         if name not in AVAILABLE_COUNTRIES:
-            raise Exception('Country not supported')
+            raise DlocalException(message='Country not supported', code=DlocalErrorCode.COUNTRY_NOT_SUPPORTED.value)
 
         return AVAILABLE_COUNTRIES[name]
 

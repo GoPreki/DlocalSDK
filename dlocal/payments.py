@@ -32,18 +32,19 @@ def create_payment(
         notification_url=notification_url,
         callback_url=callback_url,
     )
+    body = {
+        'amount': amount,
+        'currency': currency,
+        'payment_method_flow': payment_method_flow.value,
+        'country': country.code,
+        'payer': payer.to_dict(),
+        'order_id': order_id,
+        **optional_data,
+    }
 
     req = requests.post(SECURE_PAYMENTS_URL if use_secure_url else PAYMENTS_URL,
-                        headers=form_headers(),
-                        json={
-                            'amount': amount,
-                            'currency': currency,
-                            'payment_method_flow': payment_method_flow.value,
-                            'country': country.code,
-                            'payer': payer.to_dict(),
-                            'order_id': order_id,
-                            **optional_data,
-                        })
+                        headers=form_headers(body=body),
+                        json=body)
     res = req.json()
 
     check_for_errors(req=req, res=res)

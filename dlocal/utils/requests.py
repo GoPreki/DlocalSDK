@@ -1,7 +1,8 @@
-from datetime import datetime
 import hashlib
 import hmac
 import os
+import json
+from datetime import datetime
 
 from dlocal.utils.exceptions import DlocalException
 
@@ -26,7 +27,7 @@ def form_headers(body=None) -> dict:
 
 
 def generate_signature(date, body):
-    body_str = str(body) if body else ''
+    body_str = json.dumps(body) if body else ''
 
     return hmac.new(
         os.environ['DLOCAL_SECRET_KEY'].encode('utf8'),

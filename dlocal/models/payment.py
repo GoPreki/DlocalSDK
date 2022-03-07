@@ -2,6 +2,7 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Optional
 from dlocal.models.card import CreditCard
+from dlocal.models.cash import Ticket
 from dlocal.utils import optional_dict
 from dlocal.utils.dates import isoformat_to_timestamp
 
@@ -83,7 +84,7 @@ class CardPayment(Payment):
 
 @dataclass
 class RedirectPayment(Payment):
-    redirect_url: str
+    redirect_url: Optional[str]
 
     def to_dict(self) -> dict:
         return {**super().to_dict(), 'redirect_url': self.redirect_url}
@@ -100,5 +101,28 @@ class RedirectPayment(Payment):
             status=payment.status,
             status_code=payment.status_code,
             status_detail=payment.status_detail,
-            redirect_url=res['redirect_url'],
+            redirect_url=res.get('redirect_url'),
+        )
+
+
+@dataclass
+class CashPayment(Payment):
+    ticket: Optional[Ticket]
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), 'ticket': self.ticket.to_dict() if self.ticket else None}
+
+    @staticmethod
+    def from_dict(res: dict) -> 'CashPayment':
+        payment = Payment.from_dict(res)
+        return CashPayment(
+            id=payment.id,
+            method_id=payment.method_id,
+            method_type=payment.method_type,
+            creation_date=payment.creation_date,
+            approval_date=payment.approval_date,
+            status=payment.status,
+            status_code=payment.status_code,
+            status_detail=payment.status_detail,
+            ticket=Ticket.from_dict(res['ticket']) if res.get('ticket') else None,
         )

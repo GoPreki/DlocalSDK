@@ -4,8 +4,9 @@ from typing import Optional, Union
 from dlocal.models.card import PaymentCreditCard
 from dlocal.models.country import Country
 from dlocal.models.payer import Payer
-from dlocal.models.payment import PaymentMethodFlow
+from dlocal.models.payment import PaymentMethodFlow, RedirectPayment
 from dlocal.utils import optional_dict
+from dlocal.utils.exceptions import DlocalErrorCode, DlocalException
 from dlocal.utils.requests import check_for_errors, form_headers, BASE_URL
 
 PAYMENTS_URL = f'{BASE_URL}/payments'
@@ -53,3 +54,36 @@ def create_payment(
     check_for_errors(req=req, res=res)
 
     return res
+
+
+def create_redirect_payment(
+    amount: Union[int, float],
+    currency: str,
+    country: Country,
+    payer: Payer,
+    order_id: str,
+    callback_url: str,
+    payment_method_id: str,
+    original_order_id: Optional[str] = None,
+    description: Optional[str] = None,
+    notification_url: Optional[str] = None,
+) -> RedirectPayment:
+    if not callback_url:
+        raise DlocalException(code=DlocalErrorCode.MISSING_INPUTS.value,
+                              message='Missing mandatory inputs for payment creation')
+
+    payment = create_payment(
+        amount=amount,
+        currency=currency,
+        payment_method_flow=PaymentMethodFlow.REDIRECT,
+        country=country,
+        payer=payer,
+        order_id=order_id,
+        payment_method_id=payment_method_id,
+        original_order_id=original_order_id,
+        description=description,
+        notification_url=notification_url,
+        callback_url=callback_url,
+    )
+
+    return RedirectPayment.from_dict(payment)

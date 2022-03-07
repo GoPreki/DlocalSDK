@@ -1,9 +1,9 @@
-import hashlib
-import hmac
 import os
 import json
-from datetime import datetime
+import hashlib
+import hmac
 
+from dlocal.utils.dates import now_in_isoformat
 from dlocal.utils.exceptions import DlocalException
 
 _prefix = 'api' if not os.environ.get('DLOCAL_TEST', True) else 'sandbox'
@@ -14,7 +14,7 @@ X_TRANS_KEY = os.environ['DLOCAL_X_TRANS_KEY']
 
 
 def form_headers(body=None) -> dict:
-    x_date = datetime.utcnow().isoformat()[:-3] + 'Z'
+    x_date = now_in_isoformat()
     return {
         'X-Date': x_date,
         'X-Login': X_LOGIN,

@@ -16,6 +16,7 @@ class DlocalException(Exception):
 
 
 class DlocalErrorCode(Enum):
+    MISSING_INPUTS = 1
     INVALID_CREDENTIALS = 3001
     UNREGISTERED_IP_ADDRESS = 3002
     UNAUTHORIZED_MERCHANT = 3003

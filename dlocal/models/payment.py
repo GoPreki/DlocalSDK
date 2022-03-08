@@ -1,6 +1,7 @@
 from enum import Enum
 from dataclasses import dataclass
 from typing import Optional
+from dlocal.models.bank_transfer import BankTransfer
 from dlocal.models.card import CreditCard
 from dlocal.models.cash import Ticket
 from dlocal.utils import optional_dict
@@ -125,4 +126,27 @@ class CashPayment(Payment):
             status_code=payment.status_code,
             status_detail=payment.status_detail,
             ticket=Ticket.from_dict(res['ticket']) if res.get('ticket') else None,
+        )
+
+
+@dataclass
+class BankTransferPayment(Payment):
+    bank_transfer: Optional[BankTransfer]
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), 'bank_transfer': self.bank_transfer.to_dict() if self.bank_transfer else None}
+
+    @staticmethod
+    def from_dict(res: dict) -> 'BankTransferPayment':
+        payment = Payment.from_dict(res)
+        return BankTransferPayment(
+            id=payment.id,
+            method_id=payment.method_id,
+            method_type=payment.method_type,
+            creation_date=payment.creation_date,
+            approval_date=payment.approval_date,
+            status=payment.status,
+            status_code=payment.status_code,
+            status_detail=payment.status_detail,
+            bank_transfer=BankTransfer.from_dict(res['bank_transfer']) if res.get('bank_transfer') else None,
         )

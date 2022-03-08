@@ -20,11 +20,11 @@ class Ticket:
     barcode: Optional[str]
     format: Optional[str]
     expiration_date: float
-    company_name: str
-    company_id: str
-    provider_name: str
-    provider_logo: str
-    image_url: str
+    company_name: Optional[str]
+    company_id: Optional[str]
+    provider_name: Optional[str]
+    provider_logo: Optional[str]
+    image_url: Optional[str]
 
     def to_dict(self) -> dict:
         return optional_dict(
@@ -50,9 +50,9 @@ class Ticket:
             barcode=res.get('barcode'),
             format=res.get('format'),
             expiration_date=isoformat_to_timestamp(res['expiration_date']),
-            company_name=res['company_name'],
-            company_id=res['company_id'],
-            provider_name=res['provider_name'],
-            provider_logo=res['provider_logo'],
-            image_url=res['image_url'],
+            company_name=res.get('company_name'),
+            company_id=res.get('company_id'),
+            provider_name=res.get('provider_name'),
+            provider_logo=res.get('provider_logo'),
+            image_url=res.get('image_url'),
         )

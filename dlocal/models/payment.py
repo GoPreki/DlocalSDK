@@ -79,7 +79,7 @@ class CardPayment(Payment):
             status=payment.status,
             status_code=payment.status_code,
             status_detail=payment.status_detail,
-            card=res['card'].to_dict(),
+            card=CreditCard.from_dict(res['card']),
         )
 
 

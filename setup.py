@@ -14,6 +14,6 @@ setup(
     description='Python library for handling Dlocal integration',
     long_description='Python library for handling Dlocal integration',
     install_requires=[
-        'requests==2.27.0',
+        'requests >= 2.24.0',
     ],
 )

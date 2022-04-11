@@ -2,10 +2,10 @@ from typing import Optional, Union
 from dlocal.models.card import PaymentCreditCard
 from dlocal.models.country import Country
 from dlocal.models.payer import Payer
-from dlocal.models.payment import PaymentMethodFlow, RedirectPayment
+from dlocal.models.payment import Payment, PaymentMethodFlow, RedirectPayment
 from dlocal.utils import optional_dict
 from dlocal.utils.exceptions import DlocalErrorCode, DlocalException
-from dlocal.utils.requests import post
+from dlocal.utils.requests import get, post
 
 PAYMENTS_PATH = '/payments'
 SECURE_PAYMENTS_PATH = '/secure_payments'
@@ -78,3 +78,9 @@ def create_redirect_payment(
     )
 
     return RedirectPayment.from_dict(payment)
+
+
+def get_payment(order_id: str) -> Payment:
+    res = get(path=f'/orders/{order_id}')
+
+    return Payment.from_dict(res)

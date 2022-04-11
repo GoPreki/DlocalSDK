@@ -67,3 +67,10 @@ def delete(path='', body=None):
     res = req.json()
     check_for_errors(req, res)
     return res
+
+
+def get(path=''):
+    req = requests.get(url=f'{BASE_URL}{path}', headers=form_headers())
+    res = req.json()
+    check_for_errors(req, res)
+    return res

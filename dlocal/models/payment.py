@@ -49,9 +49,9 @@ class Payment:
     @staticmethod
     def from_dict(res: dict) -> 'Payment':
         return Payment(
-            id=res['id'],
-            method_id=res['payment_method_id'],
-            method_type=res['payment_method_type'],
+            id=res.get('id', res.get('payment_id')),
+            method_id=res.get('payment_method_id'),
+            method_type=res.get('payment_method_type'),
             creation_date=isoformat_to_timestamp(res['created_date']),
             approval_date=isoformat_to_timestamp(res['approved_date']) if res.get('approved_date') else None,
             status=PaymentStatus(res['status']),

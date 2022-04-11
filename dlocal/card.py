@@ -1,5 +1,3 @@
-import requests
-
 from typing import Optional, Union
 from dlocal.models.country import Country
 from dlocal.models.payer import Payer
@@ -7,9 +5,9 @@ from dlocal.models.payment import CardPayment, PaymentMethodFlow
 from dlocal.models.card import CardPayer, CreditCard, PaymentCreditCard
 from dlocal.payments import create_payment
 from dlocal.utils.exceptions import DlocalErrorCode, DlocalException
-from dlocal.utils.requests import check_for_errors, form_headers, BASE_URL
+from dlocal.utils.requests import delete, post
 
-CARDS_URL = f'{BASE_URL}/secure_cards'
+CARDS_PATH = '/secure_cards'
 
 
 def create_card_payment(
@@ -54,19 +52,10 @@ def save_card_with_token(country: Country, payer: CardPayer, card_token: str) ->
             'token': card_token
         },
     }
-    req = requests.post(CARDS_URL, headers=form_headers(body=body), json=body)
-    res = req.json()
 
-    check_for_errors(req=req, res=res)
-
+    res = post(path=CARDS_PATH, body=body)
     return CreditCard.from_dict(res)
 
 
 def delete_card(card_id: str):
-    req = requests.delete(
-        f'{CARDS_URL}/{card_id}',
-        headers=form_headers(),
-    )
-    res = req.json()
-
-    check_for_errors(req=req, res=res)
+    delete(path=f'{CARDS_PATH}/{card_id}')

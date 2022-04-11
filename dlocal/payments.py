@@ -1,5 +1,3 @@
-import requests
-
 from typing import Optional, Union
 from dlocal.models.card import PaymentCreditCard
 from dlocal.models.country import Country
@@ -7,10 +5,10 @@ from dlocal.models.payer import Payer
 from dlocal.models.payment import PaymentMethodFlow, RedirectPayment
 from dlocal.utils import optional_dict
 from dlocal.utils.exceptions import DlocalErrorCode, DlocalException
-from dlocal.utils.requests import check_for_errors, form_headers, BASE_URL
+from dlocal.utils.requests import post
 
-PAYMENTS_URL = f'{BASE_URL}/payments'
-SECURE_PAYMENTS_URL = f'{BASE_URL}/secure_payments'
+PAYMENTS_PATH = '/payments'
+SECURE_PAYMENTS_PATH = '/secure_payments'
 
 
 def create_payment(
@@ -46,14 +44,7 @@ def create_payment(
         **optional_data,
     }
 
-    req = requests.post(SECURE_PAYMENTS_URL if use_secure_url else PAYMENTS_URL,
-                        headers=form_headers(body=body),
-                        json=body)
-    res = req.json()
-
-    check_for_errors(req=req, res=res)
-
-    return res
+    return post(path=SECURE_PAYMENTS_PATH if use_secure_url else PAYMENTS_PATH, body=body)
 
 
 def create_redirect_payment(

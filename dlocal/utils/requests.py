@@ -1,24 +1,33 @@
-import os
 import json
 import hashlib
 import hmac
+import requests
 
 from dlocal.utils.dates import now_in_isoformat
-from dlocal.utils.exceptions import DlocalException
+from dlocal.utils.exceptions import DlocalErrorCode, DlocalException
 
-_prefix = 'api' if not os.environ.get('DLOCAL_TEST', True) else 'sandbox'
+
+class Keys:
+    X_LOGIN = None
+    X_TRANS_KEY = None
+    SECRET_KEY = None
+
+    TEST: bool = True
+
+
+_prefix = 'api' if not Keys.TEST else 'sandbox'
 BASE_URL = f'https://{_prefix}.dlocal.com'
-
-X_LOGIN = os.environ['DLOCAL_X_LOGIN']
-X_TRANS_KEY = os.environ['DLOCAL_X_TRANS_KEY']
 
 
 def form_headers(body=None) -> dict:
+    if not Keys.X_LOGIN or not Keys.X_TRANS_KEY or not Keys.SECRET_KEY:
+        raise DlocalException(code=DlocalErrorCode.MISSING_KEYS.value, message='Keys were not correctly initialized')
+
     x_date = now_in_isoformat()
     return {
         'X-Date': x_date,
-        'X-Login': X_LOGIN,
-        'X-Trans-Key': X_TRANS_KEY,
+        'X-Login': Keys.X_LOGIN,
+        'X-Trans-Key': Keys.X_TRANS_KEY,
         'Content-Type': 'application/json',
         'X-Version': '2.1',
         'User-Agent': 'Preki API',
@@ -27,11 +36,14 @@ def form_headers(body=None) -> dict:
 
 
 def generate_signature(date, body):
+    if not Keys.SECRET_KEY:
+        raise DlocalException(code=DlocalErrorCode.MISSING_KEYS.value, message='Keys were not correctly initialized')
+
     body_str = json.dumps(body) if body else ''
 
     return hmac.new(
-        os.environ['DLOCAL_SECRET_KEY'].encode('utf8'),
-        (X_LOGIN + date + body_str).encode('utf8'),
+        Keys.SECRET_KEY.encode('utf8'),
+        (Keys.X_LOGIN + date + body_str).encode('utf8'),
         hashlib.sha256,
     ).hexdigest()
 
@@ -41,3 +53,17 @@ def check_for_errors(req, res):
         raise DlocalException(code=res.get('code'),
                               param=res.get('param'),
                               message=res.get('message', f'Unknown Dlocal error occured: {str(res)}'))
+
+
+def post(path='', body=None):
+    req = requests.post(url=f'{BASE_URL}{path}', json=body, headers=form_headers(body=body))
+    res = req.json()
+    check_for_errors(req, res)
+    return res
+
+
+def delete(path='', body=None):
+    req = requests.delete(url=f'{BASE_URL}{path}', json=body, headers=form_headers(body=body))
+    res = req.json()
+    check_for_errors(req, res)
+    return res

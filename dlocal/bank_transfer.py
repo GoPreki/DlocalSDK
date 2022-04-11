@@ -1,12 +1,9 @@
-import requests
-
 from typing import Optional, Union
 from dlocal.models.bank_transfer import BankTransfer
 from dlocal.models.country import Country
 from dlocal.models.payer import Payer
-from dlocal.models.payment import CashPayment, PaymentMethodFlow
-from dlocal.payments import PAYMENTS_URL, create_payment
-from dlocal.utils.requests import check_for_errors, form_headers
+from dlocal.models.payment import PaymentMethodFlow
+from dlocal.payments import create_payment
 
 
 def create_bank_payment(
@@ -36,12 +33,3 @@ def create_bank_payment(
     )
 
     return BankTransfer.from_dict(payment)
-
-
-def cancel_payment(id: str) -> CashPayment:
-    req = requests.post(f'{PAYMENTS_URL}/{id}/cancel', headers=form_headers())
-    res = req.json()
-    print(f'{PAYMENTS_URL}/{id}/cancel')
-    check_for_errors(req=req, res=res)
-
-    return CashPayment.from_dict(res)

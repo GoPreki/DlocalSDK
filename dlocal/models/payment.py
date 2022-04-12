@@ -26,6 +26,7 @@ class PaymentStatus(Enum):
 @dataclass
 class Payment:
     id: str
+    order_id: Optional[str]
     method_id: str
     method_type: str
     creation_date: float
@@ -37,6 +38,7 @@ class Payment:
     def to_dict(self) -> dict:
         return optional_dict(
             id=self.id,
+            orderd_id=self.order_id,
             payment_method_id=self.method_id,
             payment_method_type=self.method_type,
             created_date=self.creation_date,
@@ -50,6 +52,7 @@ class Payment:
     def from_dict(res: dict) -> 'Payment':
         return Payment(
             id=res.get('id', res.get('payment_id')),
+            order_id=res.get('order_id'),
             method_id=res.get('payment_method_id'),
             method_type=res.get('payment_method_type'),
             creation_date=isoformat_to_timestamp(res['created_date']),
@@ -72,6 +75,7 @@ class CardPayment(Payment):
         payment = Payment.from_dict(res)
         return CardPayment(
             id=payment.id,
+            order_id=payment.order_id,
             method_id=payment.method_id,
             method_type=payment.method_type,
             creation_date=payment.creation_date,
@@ -95,6 +99,7 @@ class RedirectPayment(Payment):
         payment = Payment.from_dict(res)
         return RedirectPayment(
             id=payment.id,
+            order_id=payment.order_id,
             method_id=payment.method_id,
             method_type=payment.method_type,
             creation_date=payment.creation_date,
@@ -118,6 +123,7 @@ class CashPayment(Payment):
         payment = Payment.from_dict(res)
         return CashPayment(
             id=payment.id,
+            order_id=payment.order_id,
             method_id=payment.method_id,
             method_type=payment.method_type,
             creation_date=payment.creation_date,
@@ -141,6 +147,7 @@ class BankTransferPayment(Payment):
         payment = Payment.from_dict(res)
         return BankTransferPayment(
             id=payment.id,
+            order_id=payment.order_id,
             method_id=payment.method_id,
             method_type=payment.method_type,
             creation_date=payment.creation_date,

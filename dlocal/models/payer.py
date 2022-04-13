@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 from dlocal.utils import optional_dict
 
 
@@ -9,8 +10,8 @@ class Payer:
     phone: str
     document: str
     user_reference: str
-    device_id: str
     ip: str
+    device_id: Optional[str] = None
 
     def to_dict(self) -> dict:
         return optional_dict(
@@ -31,6 +32,6 @@ class Payer:
             phone=res['phone'],
             document=res['document'],
             user_reference=res['user_reference'],
-            device_id=res['device_id'],
             ip=res['ip'],
+            device_id=res.get('device_id'),
         )

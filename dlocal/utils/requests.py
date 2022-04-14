@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import requests
 
+from urllib.parse import quote
 from dlocal.utils.dates import now_in_isoformat
 from dlocal.utils.exceptions import DlocalErrorCode, DlocalException
 
@@ -69,7 +70,11 @@ def delete(path='', body=None):
     return res
 
 
-def get(path=''):
+def get(path='', path_params={}):
+    for key, value in path_params.items():
+        value = quote(value)
+        path = path.replace(f'/{{{key}}}', f'/{value}')
+
     req = requests.get(url=f'{BASE_URL}{path}', headers=form_headers())
     res = req.json()
     check_for_errors(req, res)

@@ -81,6 +81,6 @@ def create_redirect_payment(
 
 
 def get_payment(order_id: str) -> Payment:
-    res = get(path=f'/orders/{order_id}')
+    res = get(path='/orders/{order_id}', path_params={'order_id': order_id})
 
     return Payment.from_dict(res)

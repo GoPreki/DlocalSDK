@@ -24,6 +24,8 @@ def form_headers(body=None) -> dict:
     if not Keys.X_LOGIN or not Keys.X_TRANS_KEY or not Keys.SECRET_KEY:
         raise DlocalException(code=DlocalErrorCode.MISSING_KEYS.value, message='Keys were not correctly initialized')
 
+    body_str = json.dumps(body) if body else ''
+
     x_date = now_in_isoformat()
     return {
         'X-Date': x_date,
@@ -32,19 +34,17 @@ def form_headers(body=None) -> dict:
         'Content-Type': 'application/json',
         'X-Version': '2.1',
         'User-Agent': 'Preki API',
-        'Authorization': f'V2-HMAC-SHA256, Signature: {generate_signature(x_date, body)}',
+        'Authorization': f'V2-HMAC-SHA256, Signature: {generate_signature(x_date, body_str)}',
     }
 
 
-def generate_signature(date, body):
-    if not Keys.SECRET_KEY:
+def generate_signature(date: str, body: str):
+    if not Keys.SECRET_KEY or not Keys.X_LOGIN:
         raise DlocalException(code=DlocalErrorCode.MISSING_KEYS.value, message='Keys were not correctly initialized')
-
-    body_str = json.dumps(body) if body else ''
 
     return hmac.new(
         Keys.SECRET_KEY.encode('utf8'),
-        (Keys.X_LOGIN + date + body_str).encode('utf8'),
+        (Keys.X_LOGIN + date + body).encode('utf8'),
         hashlib.sha256,
     ).hexdigest()
 

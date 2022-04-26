@@ -16,8 +16,9 @@ class Keys:
     TEST: bool = True
 
 
-_prefix = 'api' if not Keys.TEST else 'sandbox'
-BASE_URL = f'https://{_prefix}.dlocal.com'
+def get_base_url():
+    _prefix = 'api' if not Keys.TEST else 'sandbox'
+    return f'https://{_prefix}.dlocal.com'
 
 
 def form_headers(body=None) -> dict:
@@ -57,25 +58,25 @@ def check_for_errors(req, res):
 
 
 def post(path='', body=None):
-    req = requests.post(url=f'{BASE_URL}{path}', json=body, headers=form_headers(body=body))
+    req = requests.post(url=f'{get_base_url()}{path}', json=body, headers=form_headers(body=body))
     res = req.json()
     check_for_errors(req, res)
     return res
 
 
 def delete(path='', body=None):
-    req = requests.delete(url=f'{BASE_URL}{path}', json=body, headers=form_headers(body=body))
+    req = requests.delete(url=f'{get_base_url()}{path}', json=body, headers=form_headers(body=body))
     res = req.json()
     check_for_errors(req, res)
     return res
 
 
-def get(path='', path_params={}):
+def get(path='', path_params={}, query_params={}):
     for key, value in path_params.items():
         value = quote(value)
         path = path.replace(f'/{{{key}}}', f'/{value}')
 
-    req = requests.get(url=f'{BASE_URL}{path}', headers=form_headers())
+    req = requests.get(url=f'{get_base_url()}{path}', headers=form_headers(), params=query_params)
     res = req.json()
     check_for_errors(req, res)
     return res
